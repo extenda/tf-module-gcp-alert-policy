@@ -45,7 +45,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| **auto_close** | If an alert policy that was active has no data for this long, any open incidents will close. | string | 0s | no |
+| **auto_close** | If an alert policy that was active has no data for this long, any open incidents will close. | string | n/a | no |
 
 ### **policies.documentation** supported attributes
 
@@ -104,8 +104,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| **percent** | The percentage of time series that must fail the predicate for the condition to be triggered. | number |  | no |
-| **count** | The absolute number of time series that must fail the predicate for the condition to be triggered. | number |  | no |
+| **percent** | The percentage of time series that must fail the predicate for the condition to be triggered. | number | n/a | no |
+| **count** | The absolute number of time series that must fail the predicate for the condition to be triggered. | number | 1 | no |
 
 ## Outputs
 
