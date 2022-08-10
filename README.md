@@ -104,8 +104,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| **percent** | The percentage of time series that must fail the predicate for the condition to be triggered. | number |  | no |
-| **count** | The absolute number of time series that must fail the predicate for the condition to be triggered. | number |  | no |
+| **percent** | The percentage of time series that must fail the predicate for the condition to be triggered. | number | n/a | no |
+| **count** | The absolute number of time series that must fail the predicate for the condition to be triggered. | number | 1 | no |
 
 ## Outputs
 

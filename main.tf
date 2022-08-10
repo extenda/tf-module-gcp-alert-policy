@@ -42,7 +42,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           }
 
           trigger {
-            count   = lookup(lookup(conditions.value.condition_threshold, "trigger", {}), "count", null)
+            count   = lookup(lookup(conditions.value.condition_threshold, "trigger", {}), "count", 1)
             percent = lookup(lookup(conditions.value.condition_threshold, "trigger", {}), "percent", null)
           }
         }
