@@ -45,7 +45,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| **auto_close** | If an alert policy that was active has no data for this long, any open incidents will close. | string | 0s | no |
+| **auto_close** | If an alert policy that was active has no data for this long, any open incidents will close. | string | n/a | no |
 
 ### **policies.documentation** supported attributes
 
