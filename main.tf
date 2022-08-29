@@ -13,7 +13,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     content {
       display_name = conditions.value["display_name"]
       dynamic "condition_threshold" {
-        for_each = length(lookup(conditions.value, "condition_threshold", [])) >= 1 ? ["yes"] : []
+        for_each = length(lookup(conditions.value, "condition_threshold", [])) >= 1 ? [1] : []
         content {
           comparison         = lookup(conditions.value.condition_threshold, "comparison", "COMPARISON_GT")
           filter             = lookup(conditions.value.condition_threshold, "filter", null)
@@ -26,13 +26,13 @@ resource "google_monitoring_alert_policy" "alert_policy" {
             content {
               alignment_period     = lookup(aggregations.value, "alignment_period", null)
               per_series_aligner   = lookup(aggregations.value, "per_series_aligner", null)
-              cross_series_reducer = lookup(aggregations.value, "cross_series_reducer", null)
+              cross_series_reducer = lookup(aggregations.value, "cross_series_reducer", null) == "REDUCE_NONE" ? null : lookup(aggregations.value, "cross_series_reducer", null)
               group_by_fields      = lookup(aggregations.value, "group_by_fields", [])
             }
           }
 
           dynamic "denominator_aggregations" {
-            for_each = length(lookup(conditions.value.condition_threshold, "denominator_aggregations", [])) >= 1 ? ["yes"] : []
+            for_each = length(lookup(conditions.value.condition_threshold, "denominator_aggregations", [])) >= 1 ? [1] : []
             content {
               alignment_period     = lookup(conditions.value.denominator_aggregations, "alignment_period", null)
               per_series_aligner   = lookup(conditions.value.denominator_aggregations, "per_series_aligner", null)
@@ -49,7 +49,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
       }
 
       dynamic "condition_monitoring_query_language" {
-        for_each = length(lookup(conditions.value, "condition_monitoring_query_language", [])) >= 1 ? ["yes"] : []
+        for_each = length(lookup(conditions.value, "condition_monitoring_query_language", [])) >= 1 ? [1] : []
         content {
           query                   = lookup(conditions.value.condition_monitoring_query_language, "query", "")
           duration                = lookup(conditions.value.condition_monitoring_query_language, "duration", "")
@@ -58,7 +58,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
       }
 
       dynamic "condition_matched_log" {
-        for_each = length(lookup(conditions.value, "condition_matched_log", [])) >= 1 ? ["yes"] : []
+        for_each = length(lookup(conditions.value, "condition_matched_log", [])) >= 1 ? [1] : []
         content {
           filter           = lookup(conditions.value.condition_matched_log, "filter", "")
           label_extractors = lookup(conditions.value.condition_matched_log, "label_extractors", null)
@@ -67,12 +67,15 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     }
   }
 
-  alert_strategy {
-    auto_close = lookup(lookup(each.value, "alert_strategy", {}), "auto_close", null)
+  dynamic "alert_strategy" {
+    for_each = length(lookup(each.value, "alert_strategy", [])) >= 1 ? [1] : []
+    content {
+      auto_close = lookup(each.value.alert_strategy, "auto_close", null)
+    }
   }
 
   documentation {
     mime_type = lookup(lookup(each.value, "documentation", {}), "mime_type", "text/markdown")
-    content   = lookup(lookup(each.value, "documentation", {}), "content", "Generated with terraform")
+    content   = lookup(lookup(each.value, "documentation", {}), "content", " ")
   }
 }
