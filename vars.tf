@@ -16,6 +16,6 @@ variable user_labels {
 
 variable notification_channels {
   type        = list(any)
-  description = "List of notificaton channel IDs"
+  description = "List of default notificaton channel IDs"
   default     = []
 }

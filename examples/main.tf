@@ -1,5 +1,6 @@
 module alert {
-  source                = "/Users/user/Desktop/gcp-monitoring/tf-module-gcp-monitoring/modules/alert"
+  source                = "../"
   monitoring_project_id = "hiiretail-monitoring-prod-6500"
+  notification_channels = ["projects/testproject/notificationChannels/channel_id"]
   policies              = yamldecode(file("alerts.yaml"))
 }

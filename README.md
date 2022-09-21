@@ -34,12 +34,13 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| **service\_name** | The name of the service for which uptimecheck will be created | string | n/a | **yes** |
+| **display_name** | A short name or phrase used to identify the policy in dashboards, notifications, and incidents. To avoid confusion, don't use the same display name for multiple policies in the same project. The name is limited to 512 Unicode characters. | string | n/a | **yes** |
 | **enabled** | Whether or not the policy is enabled. | bool | true | no |
 | **combiner** | How to combine the results of multiple conditions to determine if an incident should be opened. Possible values are AND, OR, and AND_WITH_MATCHING_RESOURCE. | string | OR | no |
 | **documentation** | Object containing configuration for the documentation. Documentation that is included with notifications and incidents related to this policy. Best practice is for the documentation to include information to help responders understand, mitigate, escalate, and correct the underlying problems detected by the alerting policy. Notification channels that have limited capacity might not show this documentation. | object(any) | n/a | no|
 | **alert_strategy** | Object containing configuration for the alertstrategy that's controlling how this alert policy's notification channels are notified.  | object(any) | n/a | no |
 | **conditions** | Object containing configuration for the condition/s  | object(any) | n/a | **yes** |
+| **extra_notification_channels** | Object containing configuration for the condition/s  | list(string) | n/a | no |
 
 ### **policies.alert_strategy** supported attributes
 
