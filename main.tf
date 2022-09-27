@@ -4,7 +4,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   project               = var.monitoring_project_id
   display_name          = each.value["display_name"]
   user_labels           = var.user_labels
-  notification_channels = [join(", ", var.notification_channels), join(", ", lookup(each.value, "extra_notification_channels", []))]
+  notification_channels = concat(var.notification_channels, lookup(each.value, "extra_notification_channels", []))
   enabled               = lookup(each.value, "enabled", "true")
   combiner              = lookup(each.value, "combiner", "OR")
 
