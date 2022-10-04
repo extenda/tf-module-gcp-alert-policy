@@ -54,6 +54,11 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           query                   = lookup(conditions.value.condition_monitoring_query_language, "query", "")
           duration                = lookup(conditions.value.condition_monitoring_query_language, "duration", "")
           evaluation_missing_data = lookup(conditions.value.condition_monitoring_query_language, "evaluation_missing_data", null)
+          
+          trigger {
+            count   = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "count", 1)
+            percent = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "percent", null)
+          }
         }
       }
 
