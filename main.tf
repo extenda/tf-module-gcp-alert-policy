@@ -54,7 +54,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           query                   = lookup(conditions.value.condition_monitoring_query_language, "query", "")
           duration                = lookup(conditions.value.condition_monitoring_query_language, "duration", "")
           evaluation_missing_data = lookup(conditions.value.condition_monitoring_query_language, "evaluation_missing_data", null)
-          
+
           trigger {
             count   = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "count", 1)
             percent = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "percent", null)
@@ -75,7 +75,10 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   dynamic "alert_strategy" {
     for_each = length(lookup(each.value, "alert_strategy", [])) >= 1 ? [1] : []
     content {
-      auto_close = lookup(each.value.alert_strategy, "auto_close", null)
+      auto_close              = lookup(each.value.alert_strategy, "auto_close", null)
+      notification_rate_limit {
+        period = lookup(lookup(each.value.alert_strategy, "notification_rate_limit", {}), "period", null)
+      }
     }
   }
 
