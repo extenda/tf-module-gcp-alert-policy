@@ -75,9 +75,9 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   alert_strategy {
     auto_close = lookup(each.value, "auto_close", "86400s")
     dynamic "notification_rate_limit" {
-      for_each = lookup(each.value, "notification_rate_limit", [])
+      for_each = lookup(each.value, "notification_rate_limit", {})
       content {
-        period = lookup(each.value, "period", null)
+        period = lookup(each.value.notification_rate_limit, "period", null)
       }
     }
   }
