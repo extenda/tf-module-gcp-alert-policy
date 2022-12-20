@@ -1,21 +1,21 @@
-variable monitoring_project_id {
+variable project {
   type        = string
   description = "Project ID to create monitoring resources in"
-  default     = "hiiretail-monitoring-prod-6500"
-}
-variable policies {
-  type        = any
-  description = "List of configs for alert policies"
 }
 
-variable user_labels {
+variable default_user_labels {
   type        = map(any)
-  description = "Project ID to create monitoring resources in"
+  description = "User labels set on all alerts"
   default     = {}
 }
 
-variable notification_channels {
+variable default_notification_channels {
   type        = list(any)
-  description = "List of default notificaton channel IDs"
+  description = "Notificaton channel IDs set on all alerts"
   default     = []
+}
+
+variable policies {
+  type        = any
+  description = "List of configs for alert policies"
 }

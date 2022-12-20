@@ -1,9 +1,9 @@
 resource "google_monitoring_alert_policy" "alert_policy" {
   for_each = { for alert in var.policies : alert.display_name => alert }
 
-  project               = var.monitoring_project_id
-  display_name          = each.value["display_name"]
-  user_labels           = concat(var.default_user_labels, try(each.value.user_labels, []))
+  project               = var.project
+  display_name          = each.value.display_name
+  user_labels           = merge(var.default_user_labels, try(each.value.user_labels, {}))
   notification_channels = concat(var.default_notification_channels, try(each.value.notification_channels, []))
   enabled               = try(each.value.enabled, true)
   combiner              = try(each.value.combiner, "OR")
@@ -13,7 +13,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     content {
       display_name = conditions.value.display_name
       dynamic "condition_threshold" {
-        for_each = try([conditions.value.aggregations], [])
+        for_each = try([conditions.value.condition_threshold], [])
         content {
           comparison         = try(condition_threshold.value.comparison, "COMPARISON_GT")
           filter             = try(condition_threshold.value.filter, null)
@@ -22,12 +22,12 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           denominator_filter = try(condition_threshold.value.denominator_filter, "")
 
           dynamic "aggregations" {
-            for_each = try([conditions.value.aggregations], [])
+            for_each = try(condition_threshold.value.aggregations, [])
             content {
               alignment_period     = try(aggregations.value.alignment_period, null)
-              per_series_aligner   = try(aggregations.value.per_series_aligner, null) == "REDUCE_NONE" ? null : try(aggregations.value.per_series_aligner, null)
-              cross_series_reducer = try(aggregations.value.alignment_period, null)
-              group_by_fields      = try(aggregations.value.alignment_period, null)
+              per_series_aligner   = try(aggregations.value.per_series_aligner, null) 
+              cross_series_reducer = try(aggregations.value.cross_series_reducer, null)== "REDUCE_NONE" ? null : try(aggregations.value.cross_series_reducer, null)
+              group_by_fields      = try(aggregations.value.group_by_fields, [])
             }
           }
 
