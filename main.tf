@@ -3,87 +3,88 @@ resource "google_monitoring_alert_policy" "alert_policy" {
 
   project               = var.monitoring_project_id
   display_name          = each.value["display_name"]
-  user_labels           = var.user_labels
-  notification_channels = concat(var.notification_channels, lookup(each.value, "extra_notification_channels", []))
-  enabled               = lookup(each.value, "enabled", "true")
-  combiner              = lookup(each.value, "combiner", "OR")
+  user_labels           = concat(var.default_user_labels, try(each.value.user_labels, []))
+  notification_channels = concat(var.default_notification_channels, try(each.value.notification_channels, []))
+  enabled               = try(each.value.enabled, true)
+  combiner              = try(each.value.combiner, "OR")
 
   dynamic "conditions" {
-    for_each = each.value["conditions"]
+    for_each = each.value.conditions
     content {
-      display_name = conditions.value["display_name"]
+      display_name = conditions.value.display_name
       dynamic "condition_threshold" {
-        for_each = length(lookup(conditions.value, "condition_threshold", [])) >= 1 ? [1] : []
+        for_each = try([conditions.value.aggregations], [])
         content {
-          comparison         = lookup(conditions.value.condition_threshold, "comparison", "COMPARISON_GT")
-          filter             = lookup(conditions.value.condition_threshold, "filter", null)
-          threshold_value    = lookup(conditions.value.condition_threshold, "threshold_value", null)
-          duration           = lookup(conditions.value.condition_threshold, "duration", "0s")
-          denominator_filter = lookup(conditions.value.condition_threshold, "denominator_filter", "")
+          comparison         = try(condition_threshold.value.comparison, "COMPARISON_GT")
+          filter             = try(condition_threshold.value.filter, null)
+          threshold_value    = try(condition_threshold.value.threshold_value, null)
+          duration           = try(condition_threshold.value.duration, "0s")
+          denominator_filter = try(condition_threshold.value.denominator_filter, "")
 
           dynamic "aggregations" {
-            for_each = lookup(conditions.value.condition_threshold, "aggregations", [])
+            for_each = try([conditions.value.aggregations], [])
             content {
-              alignment_period     = lookup(aggregations.value, "alignment_period", null)
-              per_series_aligner   = lookup(aggregations.value, "per_series_aligner", null)
-              cross_series_reducer = lookup(aggregations.value, "cross_series_reducer", null) == "REDUCE_NONE" ? null : lookup(aggregations.value, "cross_series_reducer", null)
-              group_by_fields      = lookup(aggregations.value, "group_by_fields", [])
+              alignment_period     = try(aggregations.value.alignment_period, null)
+              per_series_aligner   = try(aggregations.value.per_series_aligner, null) == "REDUCE_NONE" ? null : try(aggregations.value.per_series_aligner, null)
+              cross_series_reducer = try(aggregations.value.alignment_period, null)
+              group_by_fields      = try(aggregations.value.alignment_period, null)
             }
           }
 
           dynamic "denominator_aggregations" {
-            for_each = length(lookup(conditions.value.condition_threshold, "denominator_aggregations", [])) >= 1 ? [1] : []
+            for_each = try([conditions.value.condition_monitoring_query_language], [])
             content {
-              alignment_period     = lookup(conditions.value.denominator_aggregations, "alignment_period", null)
-              per_series_aligner   = lookup(conditions.value.denominator_aggregations, "per_series_aligner", null)
-              cross_series_reducer = lookup(conditions.value.denominator_aggregations, "cross_series_reducer", null)
-              group_by_fields      = lookup(conditions.value.denominator_aggregations, "group_by_fields", [])
+              alignment_period     = try(denominator_aggregations.value.alignment_period, null)
+              per_series_aligner   = try(denominator_aggregations.value.per_series_aligner, null)
+              cross_series_reducer = try(denominator_aggregations.value.cross_series_reducer, null)
+              group_by_fields      = try(denominator_aggregations.value.group_by_fields, [])
             }
           }
 
           trigger {
-            count   = lookup(lookup(conditions.value.condition_threshold, "trigger", {}), "count", 1)
-            percent = lookup(lookup(conditions.value.condition_threshold, "trigger", {}), "percent", null)
+            count   = try(condition_threshold.value.trigger.count, 1)
+            percent = try(condition_threshold.value.trigger.percent, null)
           }
         }
       }
 
       dynamic "condition_monitoring_query_language" {
-        for_each = length(lookup(conditions.value, "condition_monitoring_query_language", [])) >= 1 ? [1] : []
+        for_each = try([conditions.value.condition_monitoring_query_language], [])
         content {
-          query                   = lookup(conditions.value.condition_monitoring_query_language, "query", "")
-          duration                = lookup(conditions.value.condition_monitoring_query_language, "duration", "")
-          evaluation_missing_data = lookup(conditions.value.condition_monitoring_query_language, "evaluation_missing_data", null)
+          query                   = try(condition_monitoring_query_language.value.query, "")
+          duration                = try(condition_monitoring_query_language.value.duration, "")
+          evaluation_missing_data = try(condition_monitoring_query_language.value.evaluation_missing_data, null)
 
           trigger {
-            count   = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "count", 1)
-            percent = lookup(lookup(conditions.value.condition_monitoring_query_language, "trigger", {}), "percent", null)
+            count   = try(condition_monitoring_query_language.value.trigger.count, 1)
+            percent = try(condition_monitoring_query_language.value.trigger.percent, null)
           }
         }
       }
 
       dynamic "condition_matched_log" {
-        for_each = length(lookup(conditions.value, "condition_matched_log", [])) >= 1 ? [1] : []
+        for_each = try([conditions.value.condition_matched_log], [])
         content {
-          filter           = lookup(conditions.value.condition_matched_log, "filter", "")
-          label_extractors = lookup(conditions.value.condition_matched_log, "label_extractors", null)
+          filter           = try(condition_matched_log.value.filter, "")
+          label_extractors = try(condition_matched_log.value.label_extractors, null)
         }
       }
     }
   }
 
   alert_strategy {
-    auto_close = lookup(each.value, "auto_close", "86400s")
+    auto_close = try(each.value.alert_strategy.auto_close, "86400s")
+
     dynamic "notification_rate_limit" {
-      for_each = lookup(each.value, "notification_rate_limit", {})
+      for_each = try([each.value.alert_strategy.notification_rate_limit], [])
       content {
-        period = lookup(each.value.notification_rate_limit, "period", null)
+        period = try(notification_rate_limit.value.period, null)
       }
     }
   }
 
   documentation {
-    mime_type = lookup(lookup(each.value, "documentation", {}), "mime_type", "text/markdown")
-    content   = lookup(lookup(each.value, "documentation", {}), "content", " ")
+    mime_type = try(each.value.documentation.mime_type, "text/markdown")
+    content   = try(each.value.documentation.content, " ")
   }
 }

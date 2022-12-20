@@ -17,11 +17,12 @@
               - resource.label.subscription_id
   documentation:
     content: 'Some awesome documentation'
+
 - display_name: '[P3] CloudSQL | CPU over 65%'
   conditions:
     - display_name: Cloud SQL Database - CPU utilization above 65% over 5 min
       condition_threshold:
-        filter: |
+        filter: >
           resource.type="cloudsql_database"
           resource.labels.database_id="<MY-PROJECT>:<MY-INSTANCE>"
           metric.type="cloudsql.googleapis.com/database/cpu/utilization"
@@ -31,5 +32,5 @@
           - alignment_period: 60s
             cross_series_reducer: REDUCE_NONE
             per_series_aligner: ALIGN_MAX
-  extra_notification_channels:
+  notification_channels:
     - projects/<MY-PROJECT>/notificationChannels/<CHANNEL__ID>
