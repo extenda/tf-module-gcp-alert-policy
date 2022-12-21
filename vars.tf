@@ -17,5 +17,5 @@ variable default_notification_channels {
 
 variable policies {
   type        = any
-  description = "List of configs for alert policies"
+  description = "List of the actual alert configs"
 }
