@@ -4,7 +4,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   project               = var.project
   display_name          = each.value.display_name
   user_labels           = merge(var.default_user_labels, try(each.value.user_labels, {}))
-  notification_channels = concat(var.default_notification_channels, try(each.value.notification_channels, []))
+  notification_channels = concat(var.default_notification_channels, [for nc in try(each.value.notification_channels, []) : try(var.notification_channels_output[nc], nc)])
   enabled               = try(each.value.enabled, true)
   combiner              = try(each.value.combiner, "OR")
 
@@ -25,8 +25,8 @@ resource "google_monitoring_alert_policy" "alert_policy" {
             for_each = try(condition_threshold.value.aggregations, [])
             content {
               alignment_period     = try(aggregations.value.alignment_period, null)
-              per_series_aligner   = try(aggregations.value.per_series_aligner, null) 
-              cross_series_reducer = try(aggregations.value.cross_series_reducer, null)== "REDUCE_NONE" ? null : try(aggregations.value.cross_series_reducer, null)
+              per_series_aligner   = try(aggregations.value.per_series_aligner, null)
+              cross_series_reducer = try(aggregations.value.cross_series_reducer, null) == "REDUCE_NONE" ? null : try(aggregations.value.cross_series_reducer, null)
               group_by_fields      = try(aggregations.value.group_by_fields, [])
             }
           }
