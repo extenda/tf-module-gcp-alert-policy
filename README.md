@@ -25,7 +25,7 @@ No modules.
 
 | Name                          | Description                               | Type        | Default | Required |
 | ----------------------------- | ----------------------------------------- | ----------- | ------- | :------: |
-| __project_id__                | Project ID to create alerts in            | `string`    | n/a     |   yes    |
+| __project__                | Project ID to create alerts in            | `string`    | n/a     |   yes    |
 | default_notification_channels | NCs to be set for __all__ alerts          | `list(any)` | n/a     |    no    |
 | default_user_labels           | Labels to be set for __all__ alerts       | `map(any)`  | n/a     |    no    |
 | __policies__                  | The list of alert policies configurations | `list(any)` | n/a     |   yes    |
