@@ -23,12 +23,12 @@ No modules.
 
 ## Inputs
 
-| Name                          | Description                               | Type        | Default | Required |
-| ----------------------------- | ----------------------------------------- | ----------- | ------- | :------: |
-| __project__                | Project ID to create alerts in            | `string`    | n/a     |   yes    |
-| default_notification_channels | NCs to be set for __all__ alerts          | `list(any)` | n/a     |    no    |
-| default_user_labels           | Labels to be set for __all__ alerts       | `map(any)`  | n/a     |    no    |
-| __policies__                  | The list of alert policies configurations | `list(any)` | n/a     |   yes    |
+| Name                          | Description                                                                                                             | Type        | Default | Required |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | :------: |
+| __project__                   | Project ID to create alerts in                                                                                          | `string`    | n/a     |   yes    |
+| default_notification_channels | The "display names" of notification channels, to be set on __all__ alerts. ( Must be in the same project as the alert ) | `list(any)` | n/a     |    no    |
+| default_user_labels           | Labels to be set for __all__ alerts                                                                                     | `map(any)`  | n/a     |    no    |
+| __policies__                  | The list of alert policies configurations                                                                               | `list(any)` | n/a     |   yes    |
 
 ### policies supported attributes
 
@@ -40,7 +40,7 @@ No modules.
 | **documentation**         | Object containing configuration for the documentation. Documentation that is included with notifications and incidents related to this policy. Best practice is for the documentation to include information to help responders understand, mitigate, escalate, and correct the underlying problems detected by the alerting policy. Notification channels that have limited capacity might not show this documentation. | object(any)  | n/a     |    no    |
 | **alert_strategy**        | Object containing configuration for the alertstrategy that's controlling how this alert policy's notification channels are notified.                                                                                                                                                                                                                                                                                     | object(any)  | n/a     |    no    |
 | **conditions**            | Object containing configuration for the conditions                                                                                                                                                                                                                                                                                                                                                                       | object(any)  | n/a     | **yes**  |
-| **notification_channels** | List of notification channels for the alert. `projects/[PROJECT_ID]/notificationChannels/[CHANNEL_ID]`                                                                                                                                                                                                                                                                                                                   | list(string) | n/a     |    no    |
+| **notification_channels** | The "display names" of notification channels, to be set on the specific alert. ( Must be in the same project as the alert ).                                                                                                                                                                                                                                                                                                                              | list(string) | n/a     |    no    |
 | **user_labels**           | Labels to be set for the alert                                                                                                                                                                                                                                                                                                                                                                                           | map(any)     | n/a     |    no    |
 
 ### **policies.alert_strategy** supported attributes

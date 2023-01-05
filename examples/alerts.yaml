@@ -63,4 +63,4 @@
       - alignment_period: 60s
         per_series_aligner: ALIGN_MAX
   notification_channels:
-    - projects/<project-id>/notificationChannels/<id>
+    - "#notification_channel"

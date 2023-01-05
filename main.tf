@@ -1,12 +1,27 @@
-resource "google_monitoring_alert_policy" "alert_policy" {
-  for_each = { for alert in var.policies : alert.display_name => alert }
+data "google_monitoring_notification_channel" "all" {
+  for_each = toset(
+    concat(
+      var.default_notification_channels,
+      flatten([for alert in var.policies : try(alert.notification_channels, [])])
+    )
+  )
+  project      = var.project
+  display_name = each.value
+}
 
-  project               = var.project
-  display_name          = each.value.display_name
-  user_labels           = merge(var.default_user_labels, try(each.value.user_labels, {}))
-  notification_channels = concat(var.default_notification_channels, [for nc in try(each.value.notification_channels, []) : try(var.notification_channels_output[nc], nc)])
-  enabled               = try(each.value.enabled, true)
-  combiner              = try(each.value.combiner, "OR")
+resource "google_monitoring_alert_policy" "alert_policy" {
+  depends_on = [data.google_monitoring_notification_channel.all]
+  for_each   = { for alert in var.policies : alert.display_name => alert }
+
+  project      = var.project
+  display_name = each.value.display_name
+  enabled      = try(each.value.enabled, true)
+  combiner     = try(each.value.combiner, "OR")
+  user_labels  = merge(var.default_user_labels, try(each.value.user_labels, {}))
+  notification_channels = concat(
+    [for nc in data.google_monitoring_notification_channel.all : nc.id if contains(var.default_notification_channels, nc.display_name)],
+    [for nc in data.google_monitoring_notification_channel.all : nc.id if contains(try(each.value.notification_channels, []), nc.display_name)]
+  )
 
   dynamic "conditions" {
     for_each = each.value.conditions
