@@ -27,6 +27,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     for_each = each.value.conditions
     content {
       display_name = conditions.value.display_name
+
       dynamic "condition_threshold" {
         for_each = try([conditions.value.condition_threshold], [])
         content {
@@ -47,7 +48,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           }
 
           dynamic "denominator_aggregations" {
-            for_each = try([conditions.value.condition_monitoring_query_language], [])
+            for_each = try([conditions.value.denominator_aggregations], [])
             content {
               alignment_period     = try(denominator_aggregations.value.alignment_period, null)
               per_series_aligner   = try(denominator_aggregations.value.per_series_aligner, null)
