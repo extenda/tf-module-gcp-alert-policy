@@ -1,35 +1,66 @@
-- display_name: "[P2] Pub/Sub | Push subscription latency"
-  enabled: true
+- display_name: Log matched alert
   conditions:
-    - display_name: Push subscription latency
-      condition_threshold:
-        filter: >
-          metric.type="pubsub.googleapis.com/subscription/push_request_latencies"
-          resource.type="pubsub_subscription"
-          resource.label."project_id"="<MY-PROJECT-ID>"
-        threshold_value: 3000000.0
-        duration: 120s
-        aggregations:
-          - alignment_period: 60s
-            per_series_aligner: ALIGN_DELTA
-            cross_series_reducer: REDUCE_PERCENTILE_95
-            group_by_fields:
-              - resource.label.subscription_id
+  - display_name: Log match
+    condition_matched_log:
+      filter: >
+        resource.labels.namespace_name="gke-system"
+        resource.labels.container_name="istio-proxy"
+        httpRequest.status="500"
+  alert_strategy:
+    notification_rate_limit:
+      period: 300s
   documentation:
-    content: 'Some awesome documentation'
-- display_name: '[P3] CloudSQL | CPU over 65%'
+    content: Initial test alert for logs-based alerting.
+
+- display_name: MQL based alert - with extra userlabels
   conditions:
-    - display_name: Cloud SQL Database - CPU utilization above 65% over 5 min
-      condition_threshold:
-        filter: |
-          resource.type="cloudsql_database"
-          resource.labels.database_id="<MY-PROJECT>:<MY-INSTANCE>"
-          metric.type="cloudsql.googleapis.com/database/cpu/utilization"
-        threshold_value: 0.65
-        duration: 300s
-        aggregations:
-          - alignment_period: 60s
-            cross_series_reducer: REDUCE_NONE
-            per_series_aligner: ALIGN_MAX
-  extra_notification_channels:
-    - projects/<MY-PROJECT>/notificationChannels/<CHANNEL__ID>
+  - display_name: Request Latencies for service
+    condition_monitoring_query_language:
+      query: >
+        fetch knative_revision
+        | metric '<metric>'
+        | filter (resource.namespace_name == '<my-service>')
+        | align delta(15m)
+        | every 15m
+        | group_by [resource.service_name],
+            [value_request_latencies_percentile:
+              percentile(value.request_latencies, 99)]
+        | condition val() > 1000 'ms'
+  user_labels:
+    product: my-product
+    alert-label: alert123
+
+- display_name: Metric based alert - with documentation
+  conditions:
+  - display_name: Push subscription latency
+    condition_threshold:
+      filter: >
+        metric.type="pubsub.googleapis.com/subscription/push_request_latencies"
+        resource.type="pubsub_subscription"
+        resource.label."project_id"="<project-id>"
+      threshold_value: 3000000.0
+      duration: 120s
+      aggregations:
+      - alignment_period: 60s
+        per_series_aligner: ALIGN_DELTA
+        cross_series_reducer: REDUCE_PERCENTILE_95
+        group_by_fields:
+        - resource.label.subscription_id
+  documentation:
+    content: Some awesome documentation
+
+- display_name: Metric based alert - with extra notification channel
+  conditions:
+  - display_name: Cloud SQL Database - CPU utilization above 65% over 5 min
+    condition_threshold:
+      filter: >
+        resource.type="cloudsql_database"
+        resource.labels.database_id="<my-project>:<database_id>"
+        metric.type="cloudsql.googleapis.com/database/cpu/utilization"
+      threshold_value: 0.65
+      duration: 300s
+      aggregations:
+      - alignment_period: 60s
+        per_series_aligner: ALIGN_MAX
+  notification_channels:
+    - "#notification_channel"
