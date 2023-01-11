@@ -1,10 +1,11 @@
 locals {
-  default_combiner               = "OR"
-  default_comparison             = "COMPARISON_GT"
-  default_duration               = "0s"
-  default_trigger_count          = 1
-  default_auto_close             = "86400s" # 24h
-  fallback_notification_channels = [for nc in var.fallback_notification_channels : try(var.notification_channel_ids[nc], nc)]
+  default_combiner                       = "OR"
+  default_comparison                     = "COMPARISON_GT"
+  default_duration                       = "0s"
+  default_trigger_count                  = 1
+  default_auto_close                     = "86400s" # 24h
+  default_notification_rate_limit_period = "3600s"  # 1h
+  fallback_notification_channels         = [for nc in var.fallback_notification_channels : try(var.notification_channel_ids[nc], nc)]
 }
 
 resource "google_monitoring_alert_policy" "alert_policy" {
@@ -91,9 +92,9 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     auto_close = try(each.value.alert_strategy.auto_close, local.default_auto_close)
 
     dynamic "notification_rate_limit" {
-      for_each = try([each.value.alert_strategy.notification_rate_limit], [])
+      for_each = try([each.value.alert_strategy.notification_rate_limit], [each.value.conditions[*].condition_matched_log], [])
       content {
-        period = try(notification_rate_limit.value.period, null)
+        period = try(notification_rate_limit.value.period, local.default_auto_close)
       }
     }
   }
