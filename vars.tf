@@ -19,3 +19,9 @@ variable "default_notification_channels" {
   description = "List of display names for notification channels to be set for all alerts"
   default     = []
 }
+
+variable "notification_channel_ids" {
+  type        = map(string)
+  description = "To be able to provide channels display name instead of id/name, should be { display_name: name } or output from tf-module-gcp-notification-channels"
+  default     = {}
+}
