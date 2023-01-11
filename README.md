@@ -1,12 +1,12 @@
 ## Inputs
 
-| Name                          | Description                                                                                                             | Type        | Default | Required |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | :------: |
-| __project__                   | Project ID to create alerts in                                                                                          | `string`    | n/a     |   yes    |
-| default_notification_channels | The "display names" of notification channels, to be set on __all__ alerts. ( Must be in the same project as the alert ) | `list(any)` | n/a     |    no    |
-| default_user_labels           | Labels to be set for __all__ alerts                                                                                     | `map(any)`  | n/a     |    no    |
-| default_user_labels           | To be able to provide channels display name instead of id/name, should be { display_name: name } or output from tf-module-gcp-notification-channels.                                                                                                                      | `list(any)` | n/a     |   yes    |
-| __policies__                  | The list of alert policies configurations                                                                               | `list(any)` | n/a     |   yes    |
+| Name                          | Description                                                                                                                                                                      | Type        | Default | Required |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | :------: |
+| __project__                   | Project ID to create alerts in                                                                                                                                                   | `string`    | n/a     |   yes    |
+| default_user_labels           | Labels to be set for __all__ alerts                                                                                                                                              | `map(any)`  | n/a     |    no    |
+| default_notification_channels | Provide the full path or "display name" of the notification channel (the latter is dependant on the notification_channel_ids variable). Refer to [Examples](./examples/main.tf#L5)) | `list(any)` | n/a     |    no    |
+| notification_channel_ids      | To be able to provide channels display name instead of id/name, provide a  be { display_name: name } or output from tf-module-gcp-notification-channels.                         | `list(any)` | n/a     |   yes    |
+| __policies__                  | The list of alert policies configurations (More info below..)                                                                                                                                        | `list(any)` | n/a     |   yes    |
 
 ## default_notification_channels
 
