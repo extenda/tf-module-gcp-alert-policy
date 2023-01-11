@@ -15,11 +15,12 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   enabled      = try(each.value.enabled, true)
   combiner     = try(each.value.combiner, local.default_combiner)
   user_labels  = merge(var.default_user_labels, try(each.value.user_labels, {}))
-  # Use notification_channels or fallback_notification_channels if any exists; else use []
-  notification_channels = try(coalescelist(
-    [for nc in try(each.value.notification_channels, []) : try(var.notification_channel_ids[nc], nc)],
+
+  # Use notification_channels or fallback_notification_channels else []
+  notification_channels = try(
+    [for nc in each.value.notification_channels : try(var.notification_channel_ids[nc], nc)],
     local.fallback_notification_channels,
-  ), [])
+  )
 
   dynamic "conditions" {
     for_each = each.value.conditions
