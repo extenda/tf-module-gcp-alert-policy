@@ -62,5 +62,5 @@
       aggregations:
       - alignment_period: 60s
         per_series_aligner: ALIGN_MAX
-  notification_channels:
+  notification_channels: # NOTE! Will NOT include fallback_notification_channels!
     - "#notification_channel"

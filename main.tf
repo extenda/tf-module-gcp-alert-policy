@@ -1,10 +1,10 @@
 locals {
-  default_notification_channels = [for nc in var.default_notification_channels : try(var.notification_channel_ids[nc], nc)]
-  default_combiner              = "OR"
-  default_comparison            = "COMPARISON_GT"
-  default_duration              = "0s"
-  default_trigger_count         = 1
-  default_auto_close            = "86400s" # 24h
+  default_combiner               = "OR"
+  default_comparison             = "COMPARISON_GT"
+  default_duration               = "0s"
+  default_trigger_count          = 1
+  default_auto_close             = "86400s" # 24h
+  fallback_notification_channels = [for nc in var.fallback_notification_channels : try(var.notification_channel_ids[nc], nc)]
 }
 
 resource "google_monitoring_alert_policy" "alert_policy" {
@@ -15,10 +15,11 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   enabled      = try(each.value.enabled, true)
   combiner     = try(each.value.combiner, local.default_combiner)
   user_labels  = merge(var.default_user_labels, try(each.value.user_labels, {}))
-  notification_channels = concat(
-    local.default_notification_channels,
+  # Use notification_channels or fallback_notification_channels if any exists; else use []
+  notification_channels = try(coalescelist(
     [for nc in try(each.value.notification_channels, []) : try(var.notification_channel_ids[nc], nc)],
-  )
+    local.fallback_notification_channels,
+  ), [])
 
   dynamic "conditions" {
     for_each = each.value.conditions
