@@ -16,7 +16,7 @@ variable "default_user_labels" {
 
 variable "fallback_notification_channels" {
   type        = list(any)
-  description = "List of 'display names' or the IDs for NCs to be set for all alerts that don't provide 'notificaiton_channels'"
+  description = "List of 'display names' or 'full path' for NCs to be set for all alerts that don't provide 'notificaiton_channels'"
   default     = []
 }
 

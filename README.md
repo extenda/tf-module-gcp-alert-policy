@@ -21,7 +21,7 @@ policies = [
     enabled               = optional(boolean)  // (true) : Whether or not the policy is enabled
     combiner              = optional(string)   // (OR) - [AND, OR] : How to combine the results of multiple conditions.
     user_labels           = optional({})       // () : Labels for the alert. Will be merged with var.default_user_labels.
-    notification_channels = optional([string]) // () : List of NCs. MUST be the "display_name"s of the notification channels!
+    notification_channels = optional([string]) // () : List of NCs to be set for the alert. Provide the NCs "full path" or "display name".
 
     alert_strategy = optional({
       auto_close = optional(string) // (86400s) : Will auto close after x many seconds.
