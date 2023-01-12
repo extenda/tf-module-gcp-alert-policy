@@ -16,12 +16,12 @@ variable "default_user_labels" {
 
 variable "fallback_notification_channels" {
   type        = list(any)
-  description = "List of 'display names' or 'full path' for NCs to be set for all alerts that don't provide 'notificaiton_channels'"
+  description = "List of 'display names' or 'id' for NCs to be set for all alerts that don't provide 'notificaiton_channels'"
   default     = []
 }
 
 variable "notification_channel_ids" {
   type        = map(string)
-  description = "To be able to provide the NCs display name instead of id/name, should be { display_name: name } or output from tf-module-gcp-notification-channels"
+  description = "Enables you to provide the the NCs 'display name' instead of 'id', { nc_display_name: nc_id  } or output from tf-module-gcp-notification-channels"
   default     = {}
 }
