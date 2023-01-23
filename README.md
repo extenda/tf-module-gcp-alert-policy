@@ -1,27 +1,27 @@
 ## Inputs
 
-| Name                          | Description                                                                                                             | Type        | Default | Required |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | :------: |
-| __project__                   | Project ID to create alerts in                                                                                          | `string`    | n/a     |   yes    |
-| default_notification_channels | The "display names" of notification channels, to be set on __all__ alerts. ( Must be in the same project as the alert ) | `list(any)` | n/a     |    no    |
-| default_user_labels           | Labels to be set for __all__ alerts                                                                                     | `map(any)`  | n/a     |    no    |
-| __policies__                  | The list of alert policies configurations                                                                               | `list(any)` | n/a     |   yes    |
+| Name                           | Description                                                                                                                                                                                                                   | Type        | Default | Required |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | :------: |
+| __project__                    | Project ID to create alerts in                                                                                                                                                                                                | `string`    | n/a     |   yes    |
+| default_user_labels            | Labels to be set for __all__ alerts                                                                                                                                                                                           | `map(any)`  | n/a     |    no    |
+| fallback_notification_channels | NCs to be set for all alerts that don't provide `notification_channels`. Provide the NCs "id" or "display name" (the latter is dependant on the notification_channel_ids variable) [Example](./examples/main.tf#L5) | `list(any)` | n/a     |    no    |
+| notification_channel_ids       | To be able to provide channels display name instead of id/name, provide a  be { display_name: name } or output from tf-module-gcp-notification-channels.                                                                      | `list(any)` | n/a     |   yes    |
+| __policies__                   | The list of alert policies configurations (More info below..)                                                                                                                                                                 | `list(any)` | n/a     |   yes    |
 
-## default_notification_channels
+## __policies__
 
-This variable is the actual list of configs for the notification channels, and should be structured as shown below. \
+This variable should contain the actual list of alert configs, and should be structured as shown below. \
 📖 [Terraform Docs](https://registry.terraform.io/providers/hashicorp/google/4.47.0/docs/resources/monitoring_uptime_check_config) \
 ✅ [Examples](./examples/)
 
 ```hcl
-variable "policies" {
-  description = "List of the actual alert configs"
-  type = [{
+policies = [
+  {
     display_name          = string             // () : The Alert name
     enabled               = optional(boolean)  // (true) : Whether or not the policy is enabled
     combiner              = optional(string)   // (OR) - [AND, OR] : How to combine the results of multiple conditions.
     user_labels           = optional({})       // () : Labels for the alert. Will be merged with var.default_user_labels.
-    notification_channels = optional([string]) // () : List of NCs. MUST be the "display_name"s of the notification channels!
+    notification_channels = optional([string]) // () : List of NCs to be set for the alert. Provide the NCs "id" or "display name".
 
     alert_strategy = optional({
       auto_close = optional(string) // (86400s) : Will auto close after x many seconds.
@@ -79,10 +79,10 @@ variable "policies" {
       condition_matched_log = optional({
         filter           = optional(string) // () : A logs-based filter.
         label_extractors = optional(map())  // ()
+      })
     }]
-
-  }]
-}
+  },
+]
 ```
 
 ## Outputs
