@@ -31,11 +31,11 @@ resource "google_monitoring_alert_policy" "alert_policy" {
       dynamic "condition_threshold" {
         for_each = try([conditions.value.condition_threshold], [])
         content {
-          comparison         = try(condition_threshold.value.comparison, local.default_comparison)
-          filter             = try(condition_threshold.value.filter, null)
-          threshold_value    = try(condition_threshold.value.threshold_value, null)
-          duration           = try(condition_threshold.value.duration, local.default_duration)
-          denominator_filter = try(condition_threshold.value.denominator_filter, "")
+          comparison              = try(condition_threshold.value.comparison, local.default_comparison)
+          filter                  = try(condition_threshold.value.filter, null)
+          threshold_value         = try(condition_threshold.value.threshold_value, null)
+          duration                = try(condition_threshold.value.duration, local.default_duration)
+          denominator_filter      = try(condition_threshold.value.denominator_filter, "")
           evaluation_missing_data = try(condition_threshold.value.evaluation_missing_data, null)
 
           dynamic "aggregations" {
