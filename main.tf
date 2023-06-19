@@ -36,6 +36,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           threshold_value    = try(condition_threshold.value.threshold_value, null)
           duration           = try(condition_threshold.value.duration, local.default_duration)
           denominator_filter = try(condition_threshold.value.denominator_filter, "")
+          evaluation_missing_data = try(condition_threshold.value.evaluation_missing_data, null)
 
           dynamic "aggregations" {
             for_each = try(condition_threshold.value.aggregations, [])
@@ -63,6 +64,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           }
         }
       }
+
 
       dynamic "condition_monitoring_query_language" {
         for_each = try([conditions.value.condition_monitoring_query_language], [])
