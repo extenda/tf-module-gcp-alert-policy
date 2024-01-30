@@ -3,9 +3,9 @@ locals {
   default_comparison                     = "COMPARISON_GT"
   default_duration                       = "0s"
   default_trigger_count                  = 1
-  default_auto_close                     = "86400s" # 7 days
+  default_auto_close                     = "86400s" # 24h
+  default_notification_rate_limit_period = "900s"   # 1h
   default_evaluation_interval            = "30s"
-  default_notification_rate_limit_period = "3600s" # 1h
   fallback_notification_channels         = [for nc in var.fallback_notification_channels : try(var.notification_channel_ids[nc], nc)]
 }
 
