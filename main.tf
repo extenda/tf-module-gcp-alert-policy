@@ -58,17 +58,17 @@ resource "google_monitoring_alert_policy" "alert_policy" {
           }
 
           dynamic "denominator_aggregations" {
-            for_each = try([conditions.value.denominator_aggregations], [])
+            for_each = try(condition_threshold.value.denominator_aggregations, [])
             content {
               alignment_period     = try(denominator_aggregations.value.alignment_period, null)
               per_series_aligner   = try(denominator_aggregations.value.per_series_aligner, null)
-              cross_series_reducer = try(denominator_aggregations.value.cross_series_reducer, null)
+              cross_series_reducer = try(denominator_aggregations.value.cross_series_reducer, null) == "REDUCE_NONE" ? null : try(denominator_aggregations.value.cross_series_reducer, null)
               group_by_fields      = try(denominator_aggregations.value.group_by_fields, [])
             }
           }
 
           trigger {
-            count   = try(condition_threshold.value.trigger.count, local.default_trigger_count)
+            count   = try(condition_threshold.value.trigger.percent, null) == null ? try(condition_threshold.value.trigger.count, local.default_trigger_count) : null
             percent = try(condition_threshold.value.trigger.percent, null)
           }
         }
