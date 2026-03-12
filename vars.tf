@@ -4,8 +4,8 @@ variable "project" {
 }
 
 variable "policies" {
-  type        = any
-  description = "List of the actual alert configs"
+  description = "The list of alert policies configurations. Unknown keys are rejected by schema validation."
+  type        = list(any)
 }
 
 variable "default_user_labels" {

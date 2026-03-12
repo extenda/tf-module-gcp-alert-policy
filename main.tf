@@ -10,10 +10,10 @@ locals {
 }
 
 resource "google_monitoring_alert_policy" "alert_policy" {
-  for_each = { for alert in var.policies : alert.display_name => alert }
+  for_each = { for index, alert in var.policies : try(alert.display_name, "invalid-${index}") => alert }
 
   project      = var.project
-  display_name = each.value.display_name
+  display_name = try(each.value.display_name, each.key)
   enabled      = try(each.value.enabled, true)
   combiner     = try(each.value.combiner, local.default_combiner)
   user_labels  = merge(var.default_user_labels, try(each.value.user_labels, {}))
@@ -26,9 +26,9 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   )
 
   dynamic "conditions" {
-    for_each = each.value.conditions
+    for_each = try(each.value.conditions, [])
     content {
-      display_name = conditions.value.display_name
+      display_name = try(conditions.value.display_name, "invalid-${conditions.key}")
 
       dynamic "condition_threshold" {
         for_each = try([conditions.value.condition_threshold], [])
