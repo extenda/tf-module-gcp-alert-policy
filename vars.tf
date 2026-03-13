@@ -5,7 +5,7 @@ variable "project" {
 
 variable "policies" {
   description = "The list of alert policies configurations. Unknown keys are rejected by schema validation."
-  type        = list(any)
+  type        = any
 }
 
 variable "default_user_labels" {

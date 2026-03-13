@@ -10,7 +10,7 @@ locals {
 }
 
 resource "google_monitoring_alert_policy" "alert_policy" {
-  for_each = { for index, alert in var.policies : try(alert.display_name, "invalid-${index}") => alert }
+  for_each = { for index, alert in local.policies : try(alert.display_name, "invalid-${index}") => alert }
 
   project      = var.project
   display_name = try(each.value.display_name, each.key)

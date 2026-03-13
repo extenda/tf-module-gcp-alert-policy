@@ -102,14 +102,23 @@ locals {
 }
 
 locals {
+  policies = try([
+    for policy in var.policies :
+    jsondecode(jsonencode(policy))
+  ], [])
+
+  policies_list_error = can(var.policies[*]) ? [] : [
+    "policies must be a list of objects"
+  ]
+
   policy_object_errors = [
-    for i, policy in var.policies :
+    for i, policy in local.policies :
     "policies[${i}] must be an object"
     if !can(keys(policy))
   ]
 
   policy_key_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) ? [
         for key in setsubtract(toset(keys(policy)), local.policy_allowed_keys) :
         "policies[${i}] has unknown key '${key}'"
@@ -118,7 +127,7 @@ locals {
   ])
 
   policy_required_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) ? concat(
         contains(keys(policy), "display_name") ? [] : ["policies[${i}] missing required key 'display_name'"],
         contains(keys(policy), "conditions") ? [] : ["policies[${i}] missing required key 'conditions'"]
@@ -127,7 +136,7 @@ locals {
   ])
 
   policy_conditions_shape_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") ? (
         try(policy.conditions, null) == null ? ["policies[${i}].conditions must be a list of objects"] :
         (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? [] :
@@ -137,13 +146,13 @@ locals {
   ])
 
   policy_conditions_empty_errors = [
-    for i, policy in var.policies :
+    for i, policy in local.policies :
     "policies[${i}].conditions must contain at least one item"
     if can(keys(policy)) && contains(keys(policy), "conditions") && try(length(policy.conditions), 0) == 0
   ]
 
   condition_object_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? [
         for j, condition in policy.conditions :
         "policies[${i}].conditions[${j}] must be an object"
@@ -153,7 +162,7 @@ locals {
   ])
 
   condition_key_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           can(keys(condition)) ? [
@@ -166,7 +175,7 @@ locals {
   ])
 
   condition_required_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           can(keys(condition)) ? (
@@ -178,7 +187,7 @@ locals {
   ])
 
   condition_type_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           can(keys(condition)) ? (
@@ -194,7 +203,7 @@ locals {
   ])
 
   alert_strategy_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       try(policy.alert_strategy, null) == null ? [] :
       can(keys(policy.alert_strategy)) ? [
         for key in setsubtract(toset(keys(policy.alert_strategy)), local.alert_strategy_allowed_keys) :
@@ -204,7 +213,7 @@ locals {
   ])
 
   notification_rate_limit_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       try(policy.alert_strategy.notification_rate_limit, null) == null ? [] :
       can(keys(policy.alert_strategy.notification_rate_limit)) ? [
         for key in setsubtract(toset(keys(policy.alert_strategy.notification_rate_limit)), local.notification_rate_limit_allowed_keys) :
@@ -214,7 +223,7 @@ locals {
   ])
 
   documentation_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       try(policy.documentation, null) == null ? [] :
       can(keys(policy.documentation)) ? [
         for key in setsubtract(toset(keys(policy.documentation)), local.documentation_allowed_keys) :
@@ -224,7 +233,7 @@ locals {
   ])
 
   condition_threshold_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_threshold, null) == null ? [] :
@@ -238,7 +247,7 @@ locals {
   ])
 
   condition_threshold_aggregation_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_threshold.aggregations, null) == null ? [] :
@@ -256,7 +265,7 @@ locals {
   ])
 
   condition_threshold_denominator_aggregation_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_threshold.denominator_aggregations, null) == null ? [] :
@@ -274,7 +283,7 @@ locals {
   ])
 
   condition_threshold_trigger_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_threshold.trigger, null) == null ? [] :
@@ -288,7 +297,7 @@ locals {
   ])
 
   condition_threshold_forecast_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_threshold.forecast_options, null) == null ? [] :
@@ -302,7 +311,7 @@ locals {
   ])
 
   condition_mql_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_monitoring_query_language, null) == null ? [] :
@@ -316,7 +325,7 @@ locals {
   ])
 
   condition_mql_trigger_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_monitoring_query_language.trigger, null) == null ? [] :
@@ -330,7 +339,7 @@ locals {
   ])
 
   condition_pql_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_prometheus_query_language, null) == null ? [] :
@@ -344,7 +353,7 @@ locals {
   ])
 
   condition_matched_log_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_matched_log, null) == null ? [] :
@@ -358,7 +367,7 @@ locals {
   ])
 
   condition_absent_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_absent, null) == null ? [] :
@@ -372,7 +381,7 @@ locals {
   ])
 
   condition_absent_trigger_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_absent.trigger, null) == null ? [] :
@@ -386,7 +395,7 @@ locals {
   ])
 
   condition_absent_aggregation_errors = flatten([
-    for i, policy in var.policies : (
+    for i, policy in local.policies : (
       can(keys(policy)) && contains(keys(policy), "conditions") && (can(policy.conditions[0]) || try(length(policy.conditions), 0) == 0) ? flatten([
         for j, condition in policy.conditions : (
           try(condition.condition_absent.aggregations, null) == null ? [] :
@@ -404,6 +413,7 @@ locals {
   ])
 
   policy_schema_errors = concat(
+    local.policies_list_error,
     local.policy_object_errors,
     local.policy_key_errors,
     local.policy_required_errors,
