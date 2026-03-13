@@ -10,7 +10,7 @@
 
 ## `policies`
 
-This variable should contain the actual list of alert configs, and should be structured as shown below. \
+This variable should contain the actual list of alert configs, and should be structured as shown below. Unknown keys are rejected by module validation to catch typos/indentation issues early (enforced during plan/apply). \
 📖 [Terraform Docs](https://registry.terraform.io/providers/hashicorp/google/5.14.0/docs/resources/monitoring_alert_policy) \
 ✅ [Examples](./examples/)
 
@@ -46,6 +46,7 @@ policies = [
         threshold_value         = optional(number)    // Value to compare against
         duration                = optional(string)    // Duration for threshold violation (default: "0s")
         denominator_filter      = optional(string)    // Filter for denominator time series
+        evaluation_missing_data = optional(string)    // Behavior when data is missing
 
         aggregations = optional([{
           alignment_period       = optional(string)   // Period for alignment
@@ -83,6 +84,8 @@ policies = [
       })
 
       condition_prometheus_query_language = optional({
+        query               = optional(string)        // Prometheus query
+        duration            = optional(string)        // Duration for the query to be true
         evaluation_interval = optional(string)        // The interval over which to evaluate the condition.
         labels              = optional(map(string))   // A set of labels to attach to the alert.
         rule_group          = optional(string)        // The name of the Prometheus rule group.
