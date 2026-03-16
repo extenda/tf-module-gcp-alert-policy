@@ -441,15 +441,13 @@ locals {
   )
 }
 
-resource "null_resource" "policy_schema_validation" {
-  triggers = {
-    policies_hash = sha1(jsonencode(var.policies))
-  }
+locals {
+  alert_keys = [for i, policy in local.policies : try(policy.display_name, "invalid-${i}")]
 
-  lifecycle {
-    precondition {
-      condition     = length(local.policy_schema_errors) == 0
-      error_message = "policies schema validation failed:\n${join("\n", local.policy_schema_errors)}"
-    }
+  policy_errors_by_key = {
+    for i, key in local.alert_keys : key => [
+      for err in local.policy_schema_errors : err
+      if startswith(err, "policies[${i}]") || err == "policies must be a list of objects"
+    ]
   }
 }

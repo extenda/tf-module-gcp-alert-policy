@@ -153,4 +153,11 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     content   = try(each.value.documentation.content, " ")
     subject   = try(each.value.documentation.subject, null)
   }
+  lifecycle {
+    precondition {
+      condition     = length(local.policy_errors_by_key[each.key]) == 0
+      
+      error_message = "Validation failed for '${each.key}':\n${join("\n", local.policy_errors_by_key[each.key])}"
+    }
+  }
 }
