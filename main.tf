@@ -155,10 +155,8 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   }
   lifecycle {
     precondition {
-      # Look up the errors for THIS specific policy
       condition     = length(local.policy_errors_by_key[each.key]) == 0
       
-      # Print only the errors relevant to this policy
       error_message = "Validation failed for '${each.key}':\n${join("\n", local.policy_errors_by_key[each.key])}"
     }
   }
